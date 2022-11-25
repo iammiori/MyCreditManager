@@ -18,3 +18,23 @@
 - 성적삭제
 - 평점보기
 - 종료
+
+♻🪄 refactoring 과정
+```
+해당 과제에서 진행한 refactoring 부분에 대한 정리입니다.
+```
+1. 데이터 구조
+`var students:[String: [[String: String]]] = [:]` 
+위와 같은 String 딕셔너리 형태에서, struct를 따로 설계하여 유지보수에 유리하게 리팩토링하였습니다.
+```swift
+struct Grade {
+    var subject : String
+    var grade : Double
+}
+
+struct GradeManage {
+    let name: String
+    var credit : [Grade?]
+}
+```
+모델을 다음과 같이 설정하고, 메인에서  `var students : [GradeManage] = []` 로 사용하였습니다.
