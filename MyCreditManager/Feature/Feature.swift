@@ -8,17 +8,16 @@
 import Foundation
 
 class Feature {
-    static var students : [GradeManage] = []
+    var students : [GradeManage] = []
     
-    
-    static func readLineService(selected:String) {
+    func readLineService(selected:String) {
         switch selected {
         case "1":
             addStudent()
         case "2":
             removeStudent()
         case "3":
-            insertGrade()
+            addGrade()
         case "4":
             removeCredit()
         case "5":
@@ -28,11 +27,11 @@ class Feature {
     }
     
     //학생추가
-    static private func addStudent() {
+    private func addStudent() {
         let input = readLine()
         let studentInput = String(input ?? "")
-
-        if students.filter({ $0.name == studentInput })[0] == nil {
+        
+        if students.filter({ $0.name == studentInput }).count == 0 {
             let student = GradeManage(name: studentInput, credit: [])
             students.append(student)
             print("\(studentInput) 학생을 추가했습니다.")
@@ -40,13 +39,13 @@ class Feature {
             print("\(studentInput)은 이미 있는 학생입니다. 추가하지 않습니다.")
         }
     }
-
+    
     //학생삭제
-    static private func removeStudent() {
+    private func removeStudent() {
         let input = readLine()
         let studentInput = String(input ?? "")
         
-        if students.filter({ $0.name == studentInput})[0] != nil {
+        if students.filter({ $0.name == studentInput}).count > 0 {
             guard let removeIndex = students.firstIndex(where: {$0.name == studentInput}) else { return }
             students.remove(at: removeIndex)
             print("\(studentInput) 학생을 삭제하였습니다.")
@@ -56,96 +55,86 @@ class Feature {
     }
     
     //성적추가(변경)
-    static private func insertGrade() {
+    private func addGrade() {
         let input = readLine()
-
+        
         let componentInput = input?.components(separatedBy: " ")
-        let input1Name = String(componentInput?[0] ?? "1x")
-        let input2Subject = String(componentInput?[1] ?? "2x")
-        let input3Grade = String(componentInput?[2] ?? "3x")
+        let studentName = String(componentInput?[0] ?? "")
+        let subjectName = String(componentInput?[1] ?? "")
+        let gradeName = String(componentInput?[2] ?? "")
         
-        
-        
-        guard input1Name != "1x" && input2Subject != "2x" && input3Grade != "3x" else {
-            print("입력이 잘못되었습니다. 다시확인해주세요")
+        // 다 값이 있을때
+        guard studentName != "" && subjectName != "" && gradeName != "" else {
+            print(MainStream.inputErr)
             return
         }
         
-        let input3ToDouble = changeGradeToInt(input3Grade)
+        let input3ToDouble = changeGradeToInt(gradeName)
         guard input3ToDouble != -100 else {
-            print("입력이 잘못되었습니다. 다시확인해주세요")
+            print(MainStream.inputErr)
             return
         }
         
-        let grade = Grade(subject: input2Subject, grade: input3ToDouble)
+        let grade = Grade(subject: subjectName, grade: input3ToDouble)
         
-        if students.map({$0.name == input1Name})[0] != nil {
-            guard let findIndex = students.firstIndex(where: {$0.name == input1Name}) else {
-                return  }
+        if students.filter({$0.name == studentName}).count == 0 {
+            print("해당학생 존재하지 않습니다.")
+        } else {
+            guard let findIdx = students.firstIndex(where: {$0.name == studentName}) else { return }
+            let foundStudent = students[findIdx]
             
-            let student = students[findIndex]
-            
-            
-            if student.credit.filter({$0?.subject == input2Subject})[0] != nil {
-                let findIndex2 = student.credit.firstIndex(where: {$0?.subject == input2Subject})
-                
-                students[findIndex].credit[findIndex2 ?? 0] = grade
+            if foundStudent.credit.filter({$0?.subject == subjectName}).count > 0 {
+                let findIdx2 = foundStudent.credit.firstIndex(where: {$0?.subject == subjectName})
+                students[findIdx].credit[findIdx2 ?? 0] = grade
             } else {
-                students[findIndex].credit.append(grade)
+                students[findIdx].credit.append(grade)
             }
-            print("\(input1Name) 학생의 \(input2Subject) 과목성적이 \(input3Grade) 로 추가(변경) 되었습니다.")
-            
-        }else {
-            print("해당학생은 존재하지 않습니다.")
+            print("추가(변경)완료")
         }
     }
     
-    
+
     //성적삭제
-    static private func removeCredit() {
+    private func removeCredit() {
         let input = readLine()
         
         let componetInput = input?.components(separatedBy: " ")
-        let input1Name = String(componetInput?[0] ?? "1x")
-        let input2Subject = String(componetInput?[1] ?? "2x")
+        let studentName = String(componetInput?[0] ?? "")
+        let subjectName = String(componetInput?[1] ?? "")
         
-        print("111 => \(input1Name)")
-        print("222 => \(input2Subject)")
-        
-        guard input1Name != "1x" && input2Subject != "2x" else {
-            print("입력이 잘못되었습니다. 다시확인해주세요")
+        guard studentName != "" && subjectName != "" else {
+            print(MainStream.inputErr)
             return
         }
         
-        
-        if students.filter({$0.name == input1Name})[0] != nil {
-            guard let studentIndex = students.firstIndex(where: {$0.name == input1Name}) else { return }
+        if students.filter({$0.name == studentName}).count > 0 {
+            guard let studentIdx = students.firstIndex(where: {$0.name == studentName}) else { return }
             
-            if students[studentIndex].credit.map({$0?.subject == input2Subject})[0] != nil {
+            if students[studentIdx].credit.filter({$0?.subject == subjectName}).count > 0 {
                 
-                guard let creditIndex = students[studentIndex].credit.firstIndex(where: {$0?.subject == input2Subject}) else {
+                guard let creditIndex = students[studentIdx].credit.firstIndex(where: {$0?.subject == subjectName}) else {
                     return
                 }
                 
-                students[studentIndex].credit.remove(at: creditIndex)
+                students[studentIdx].credit.remove(at: creditIndex)
                 
-                print("\(input1Name) 학생의 \(input2Subject) 성적을 삭제했습니다.")
+                print("\(studentName) 학생의 \(subjectName) 성적을 삭제했습니다.")
                 
             } else {
-                print("\(input2Subject) 과목이 존재하지 않습니다. ")
+                print("\(subjectName) 과목이 존재하지 않습니다. ")
             }
-        }else {
-            print("\(input1Name) 학생을 찾지 못했습니다.")
-
+        } else {
+            print("\(studentName) 학생을 찾지 못했습니다.")
+            
         }
     }
     
     //평점보기
-    static private func showAverageGrade() {
+    private func showAverageGrade() {
         let input = readLine()
         let studentInput = String(input ?? "")
-
-        if students.filter({ $0.name == studentInput })[0] != nil {
+        
+        if students.filter({ $0.name == studentInput }).count > 0 {
             guard let findIndex = students.firstIndex(where: {$0.name == studentInput}) else { return }
             
             if students[findIndex].credit.isEmpty {
@@ -153,15 +142,12 @@ class Feature {
             }else {
                 let studentCredit = students[findIndex].credit
                 var allGrade : Double = 0
-                for i in studentCredit {
+                for grade in studentCredit {
                     
-                    
-                    if let ii = i {
-                        print("\(ii.subject): \(ii.grade)")
-                        allGrade += ii.grade
+                    if let existGrade = grade {
+                        print("\(existGrade.subject): \(existGrade.grade)")
+                        allGrade += existGrade.grade
                     }
-                    
-                    
                 }
                 print("평점: \(allGrade / Double(studentCredit.count))")
             }
@@ -172,7 +158,7 @@ class Feature {
     
     
     
-    static private func changeGradeToInt(_ grade:String) -> Double {
+    private func changeGradeToInt(_ grade:String) -> Double {
         switch grade {
         case "A+":
             return 4.5
@@ -196,5 +182,4 @@ class Feature {
             return -100
         }
     }
-    
 }
