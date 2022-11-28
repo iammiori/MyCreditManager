@@ -29,7 +29,7 @@
 
 ### ♻🪄 refactoring 과정
 ```
-해당 과제에서 진행한 refactoring 부분에 대한 정리입니다.
+스스로 refactoring을 진행하여, 더 나은 코드에 대해 고민한 부분에 대한 정리입니다.
 ```
 1. 데이터 구조
 `var students:[String: [[String: String]]] = [:]` 
