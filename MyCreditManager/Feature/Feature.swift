@@ -7,6 +7,10 @@
 
 import Foundation
 
+/*
+ - 주석은 없어도 됨
+ - 주석 없이도 이해되는 코드 작성 필요
+ */
 class Feature {
     var students : [GradeManage] = []
     
